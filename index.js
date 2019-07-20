@@ -1,10 +1,14 @@
 const readline = require('readline-sync');
+const bots = {
+    text: require('./bots/text.js')
+};
 
 function init() {
     const data = {};
     data.searchTerm = returnSearchTerm();
     data.prefix = returnPrefix();
     console.log(data);
+    bots.text(data);
 
     /* Funções Internas */
 
