@@ -1,6 +1,12 @@
 #IDEA
-
 .idea/
+
+# Windows Batch
+a.bat
+
+# Credentials
+
+credentials/
 
 # Logs
 logs

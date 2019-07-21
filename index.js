@@ -3,9 +3,10 @@ const bots = {
     text: require('./bots/text.js')
 };
 
-function init() {
-    const data = bots.input();
-    bots.text(data);
+async function init() {
+    const data = bots.input.main();
+    await bots.text(data);
+    console.log(data);
 }
 
 init();

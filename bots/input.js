@@ -17,8 +17,13 @@ function returnSearchTerm() {
 
 function returnPrefix() {
     const prefixes = ['Quem é', 'O que é', 'A história de'];
-    const selectedPrefix = readline.keyInSelect(prefixes.norm(), 'Selecione o prefixo:');
-    return prefixes[selectedPrefix];
+    const index = readline.keyInSelect(prefixes.norm(), 'Selecione o prefixo:');
+    return prefixes[index];
 }
 
-module.exports = main;
+function selectArticle(search) {
+    const index = readline.keyInSelect(search.norm(), 'Selecione o artigo');
+    return search[index];
+}
+
+module.exports = {main: main, selectArticle: selectArticle};
