@@ -13,12 +13,16 @@ const nlu = new WatsonNLU({
     url: 'https://gateway.watsonplatform.net/natural-language-understanding/api/'
 });
 
-async function bot(data) {
+const files = require('./files');
+
+async function bot() {
+    const data = files.load();
     await getTextFromWikipedia(data);
     sanitizeText(data);
     breakTextIntoSentences(data);
     limitMaxSentences(data);
     await getKeyWords(data);
+    files.save(data);
 }
 
 async function getTextFromWikipedia(data) {

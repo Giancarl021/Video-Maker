@@ -5,7 +5,10 @@
 a.bat
 
 # Credentials
-credentials/
+credentials/*.json
+
+# Intermediate Data
+data/data.json
 
 # Logs
 logs

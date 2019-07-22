@@ -4,10 +4,9 @@ const bots = {
 };
 
 async function init() {
-    const data = bots.input.main();
-    data.maximumSenteces = 8;
-    await bots.text(data);
-    console.log(data);
+    bots.input.main();
+    await bots.text();
+    console.log(require('./bots/files').load());
 }
 
 init();
