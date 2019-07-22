@@ -1,12 +1,24 @@
 const Algorithmia = require('algorithmia');
 const AlgorithmiaApiKey = require('../credentials/algorithmia.json');
+
 const SentenceBoundaryDetection = require('sbd');
+
 const input = require('./input');
+
+const watsonApiKey = require('../credentials/watson-nlu').apikey;
+const WatsonNLU = require('ibm-watson/natural-language-understanding/v1.js');
+const nlu = new WatsonNLU({
+    iam_apikey: watsonApiKey,
+    version: '2018-04-05',
+    url: 'https://gateway.watsonplatform.net/natural-language-understanding/api/'
+});
 
 async function bot(data) {
     await getTextFromWikipedia(data);
     sanitizeText(data);
     breakTextIntoSentences(data);
+    limitMaxSentences(data);
+    await getKeyWords(data);
 }
 
 async function getTextFromWikipedia(data) {
@@ -68,6 +80,32 @@ function breakTextIntoSentences(data) {
         });
 
         return sentences;
+    }
+}
+
+function limitMaxSentences(data) {
+    data.sentences = data.sentences.slice(0, data.maximumSenteces);
+}
+
+async function getKeyWords(data) {
+
+    for(const sentence of data.sentences) {
+        sentence.keywords = await returnKeywordsFromWatson(sentence.text);
+    }
+
+    async function returnKeywordsFromWatson(sentence) {
+        return new Promise((resolve, reject) => {
+            nlu.analyze({
+                text: sentence,
+                features: {
+                    keywords: {}
+                }
+            }, (err, res) => {
+                if(err) reject(err);
+                const keywords = res.keywords.map(e => e.text);
+                resolve(keywords);
+            })
+        });
     }
 }
 
