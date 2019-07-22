@@ -5,6 +5,7 @@ const bots = {
 
 async function init() {
     const data = bots.input.main();
+    data.maximumSenteces = 8;
     await bots.text(data);
     console.log(data);
 }
