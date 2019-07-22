@@ -1,4 +1,5 @@
 const readline = require('readline-sync');
+const files = require('./files');
 
 Array.prototype.norm = function () {
     return this.map(e => e.normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
@@ -8,7 +9,8 @@ function main() {
     const data = {};
     data.searchTerm = returnSearchTerm();
     data.prefix = returnPrefix();
-    return data;
+    data.maximumSenteces = 8;
+    files.save(data);
 }
 
 function returnSearchTerm() {
@@ -26,4 +28,4 @@ function selectArticle(search) {
     return search[index];
 }
 
-module.exports = {main: main, selectArticle: selectArticle};
+module.exports = {main, selectArticle};
