@@ -5,10 +5,10 @@ const bots = {
 };
 
 async function init() {
-    bots.input.main();
-    await bots.text();
+    // bots.input.main();
+    // await bots.text();
     await bots.images();
-    console.dir(require('./bots/files').load(), {depth: null});
+    // console.dir(require('./bots/files').load(), {depth: null});
 }
 
 init();
