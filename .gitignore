@@ -8,8 +8,7 @@ a.bat
 credentials/*.json
 
 # Intermediate Data
-data/*.json
-data/images/
+data/
 
 # Logs
 logs
