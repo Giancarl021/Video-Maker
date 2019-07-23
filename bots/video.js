@@ -9,8 +9,6 @@ const ffprobePath = require('@ffprobe-installer/ffprobe').path;
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
-const audioData = require('../data/audio');
-
 async function bot() {
     const data = files.load();
     console.log('> Editando imagens');
@@ -136,27 +134,28 @@ async function createThumb(data) {
 
 async function renderVideo(data) {
     await videoshowRender();
-    console.log(audioData);
-    process.exit(0);
+
     async function videoshowRender() {
+        const audioData = files.loadAudioData();
+        const audio = audioData[Math.floor(Math.random() * audioData.length)];
         const images = [{
             path: './data/images/static/start.png',
-            loop: 0
+            loop: audio.timeData.start
         }];
         for (let sentenceIndex = 0; sentenceIndex < data.sentences.length; sentenceIndex++) {
             images.push({
                 path: `./data/images/${sentenceIndex}-edited.png`,
-                loop: 3
+                loop: audio.timeData.images[sentenceIndex]
             });
             images.push({
                 path: `./data/images/${sentenceIndex}-sentence.png`,
-                loop: 7
+                loop: audio.timeData.sentences[sentenceIndex]
             });
         }
 
         images.push({
-           path: './data/images/static/end.png',
-           loop: 0
+            path: './data/images/static/end.png',
+            loop: 20
         });
 
         const options = {
@@ -173,7 +172,7 @@ async function renderVideo(data) {
             pixelFormat: "yuv420p",
         };
         return videoshow(images, options)
-            // .audio('')
+        .audio(audio.path)
             .save('data/render.mp4')
             .on('error', err => {
                 console.log('> Erro ao renderizar vídeo: ', err);
