@@ -2,7 +2,8 @@ const bots = {
     input: require('./bots/input'),
     text: require('./bots/text'),
     image: require('./bots/image'),
-    video: require('./bots/video')
+    video: require('./bots/video'),
+    cleaner: require('./bots/cleaner')
 };
 
 async function init() {
@@ -10,7 +11,9 @@ async function init() {
     // await bots.text();
     // await bots.image();
     await bots.video();
-    // console.dir(require('./bots/files').load(), {depth: null});
+    bots.cleaner();
 }
 
-init();
+init().catch(err => {
+    console.log('Erro no programa: ', err);
+});

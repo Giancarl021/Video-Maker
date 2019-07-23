@@ -8,7 +8,7 @@ Array.prototype.norm = function () {
 function main() {
     const data = {};
     data.searchTerm = returnSearchTerm();
-    data.prefix = returnPrefix();
+    // data.prefix = returnPrefix();
     data.maximumSentences = 8;
     files.save(data);
 }

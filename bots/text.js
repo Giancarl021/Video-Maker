@@ -102,7 +102,7 @@ async function getKeyWords(data) {
     }
 
     async function returnKeywordsFromWatson(sentence) {
-        return new Promise((resolve, reject) => {
+        const promise = new Promise((resolve, reject) => {
             nlu.analyze({
                 text: sentence,
                 features: {
@@ -114,6 +114,13 @@ async function getKeyWords(data) {
                 resolve(keywords);
             })
         });
+
+        promise.catch(() => {
+            console.log('> Erro ao carregar palavras-chave');
+            process.exit(0);
+        });
+
+        return promise;
     }
 }
 

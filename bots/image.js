@@ -34,9 +34,13 @@ async function returnImageLinks(query) {
         q: query,
         num: 5,
         searchType: 'image',
-        imgSize: 'huge',
-        rights: 'cc_publicdomain'
+        imgSize: 'huge'
     });
+
+    if(!response.data.items) {
+        console.log('> Erro ao carregar imagens');
+        process.exit(0);
+    }
 
     return response.data.items.map(e => {
         return {url: e.link, context: e.image.contextLink}
