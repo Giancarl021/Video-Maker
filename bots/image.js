@@ -6,7 +6,7 @@ const imgDownloader = require('image-downloader');
 async function bot() {
     const data = files.load();
     console.log('> Buscando imagens');
-    // await getImages(data);
+    await getImages(data);
     console.log('> Baixando imagens');
     await downloadImages(data);
     console.log('> Imagens carregadas');
@@ -35,7 +35,7 @@ async function returnImageLinks(query) {
         num: 5,
         searchType: 'image',
         imgSize: 'huge',
-        rights: 'cc_publicdomain',
+        rights: 'cc_publicdomain'
     });
 
     return response.data.items.map(e => {

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/Giancarl021/Video-Maker#readme",
   "dependencies": {
     "algorithmia": "^0.3.10",
+    "gm": "^1.23.1",
     "googleapis": "^41.0.1",
     "ibm-watson": "^4.2.5",
     "image-downloader": "^3.4.2",

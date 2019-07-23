@@ -92,12 +92,12 @@ function breakTextIntoSentences(data) {
 }
 
 function limitMaxSentences(data) {
-    data.sentences = data.sentences.slice(0, data.maximumSenteces);
+    data.sentences = data.sentences.slice(0, data.maximumSentences);
 }
 
 async function getKeyWords(data) {
 
-    for(const sentence of data.sentences) {
+    for (const sentence of data.sentences) {
         sentence.keywords = await returnKeywordsFromWatson(sentence.text);
     }
 
@@ -109,7 +109,7 @@ async function getKeyWords(data) {
                     keywords: {}
                 }
             }, (err, res) => {
-                if(err) reject(err);
+                if (err) reject(err);
                 const keywords = res.keywords.map(e => e.text);
                 resolve(keywords);
             })
