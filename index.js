@@ -1,13 +1,15 @@
 const bots = {
-    input: require('./bots/input.js'),
-    text: require('./bots/text.js'),
-    images: require('./bots/images')
+    input: require('./bots/input'),
+    text: require('./bots/text'),
+    image: require('./bots/image'),
+    video: require('./bots/video')
 };
 
 async function init() {
     // bots.input.main();
     // await bots.text();
-    await bots.images();
+    // await bots.image();
+    await bots.video();
     // console.dir(require('./bots/files').load(), {depth: null});
 }
 

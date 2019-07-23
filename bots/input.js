@@ -9,7 +9,7 @@ function main() {
     const data = {};
     data.searchTerm = returnSearchTerm();
     data.prefix = returnPrefix();
-    data.maximumSenteces = 8;
+    data.maximumSentences = 8;
     files.save(data);
 }
 
