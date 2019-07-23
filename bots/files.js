@@ -1,5 +1,6 @@
 const fs = require('fs');
 const dataFilePath = './data/data.json';
+const audioFilePath = './data/audio.json';
 
 function save(data) {
     const dataString = JSON.stringify(data);
@@ -11,7 +12,13 @@ function load() {
     return JSON.parse(stringBuffer);
 }
 
+function loadAudioData() {
+    const stringBuffer = fs.readFileSync(audioFilePath, 'utf-8');
+    return JSON.parse(stringBuffer);
+}
+
 module.exports = {
     save,
-    load
+    load,
+    loadAudioData
 };

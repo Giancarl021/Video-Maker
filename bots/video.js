@@ -1,6 +1,14 @@
 const files = require('./files');
 const gm = require('gm').subClass({imageMagick: true});
 
+const videoshow = require('videoshow');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const ffprobePath = require('@ffprobe-installer/ffprobe').path;
+
+ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath);
+
 async function bot() {
     const data = files.load();
     console.log('> Editando imagens');
@@ -10,8 +18,9 @@ async function bot() {
     // await generateImagesFromSentences(data);
     console.log('> Imagens geradas');
     console.log('> Gerando Thumbnail');
-    await createThumb(data);
-    await renderVideo();
+    // await createThumb(data);
+    console.log('> Renderizando vídeo');
+    await renderVideo(data);
 }
 
 async function editImages(data) {
@@ -80,6 +89,8 @@ async function generateImagesFromSentences(data) {
                 }
             ];
             gm()
+                .in(`./data/images/${index}-edited.png`)
+                .out('-brightness-contrast', '-30x-10')
                 .out('-background', 'transparent')
                 .out('-fill', 'white')
                 .out('-size', sentenceTemplates[index > 3 ? index - 4 : index].size)
@@ -88,14 +99,13 @@ async function generateImagesFromSentences(data) {
                 .out('-fill', 'white')
                 .out('-kerning', '-1')
                 .out(`caption:${sentence.text}`)
+                .out('-composite')
                 .write(output, err => {
                     if (err) return reject(err);
                 });
-            console.log('> Imagem X Gerada');
             resolve();
         });
     }
-
 }
 
 async function createThumb(data) {
@@ -115,15 +125,62 @@ async function createThumb(data) {
             .out(`caption:${text}`)
             .out('-composite')
             .write('./data/images/thumb.jpg', err => {
-                if(err) reject(err)
+                if (err) reject(err)
             });
         console.log('> Thumbnail Gerada');
         resolve();
     })
 }
 
-async function renderVideo() {
+async function renderVideo(data) {
+    await videoshowRender();
 
+    async function videoshowRender() {
+        const audioData = files.loadAudioData();
+        const audio = audioData[Math.floor(Math.random() * audioData.length)];
+        const images = [{
+            path: './data/images/static/start.png',
+            loop: audio.timeData.start
+        }];
+        for (let sentenceIndex = 0; sentenceIndex < data.sentences.length; sentenceIndex++) {
+            images.push({
+                path: `./data/images/${sentenceIndex}-edited.png`,
+                loop: audio.timeData.images[sentenceIndex]
+            });
+            images.push({
+                path: `./data/images/${sentenceIndex}-sentence.png`,
+                loop: audio.timeData.sentences[sentenceIndex]
+            });
+        }
+
+        images.push({
+            path: './data/images/static/end.png',
+            loop: 20
+        });
+
+        const options = {
+            fps: 25,
+            loop: 5,
+            transition: true,
+            transitionDuration: 1,
+            videoBitrate: 4000,
+            videoCodec: "libx264",
+            size: "?x1080",
+            audioBitrate: "128k",
+            audioChannels: 2,
+            format: "mp4",
+            pixelFormat: "yuv420p",
+        };
+        return videoshow(images, options)
+        .audio(audio.path)
+            .save('data/render.mp4')
+            .on('error', err => {
+                console.log('> Erro ao renderizar vídeo: ', err);
+            })
+            .on('end', () => {
+                console.log('> Vídeo renderizado');
+            });
+    }
 }
 
 module.exports = bot;
