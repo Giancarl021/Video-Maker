@@ -7,11 +7,11 @@ const bots = {
 };
 
 async function init() {
+    // bots.cleaner();
     // bots.input.main();
     // await bots.text();
     // await bots.image();
     await bots.video();
-    // bots.cleaner();
 }
 
 init().catch(err => {
