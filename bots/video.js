@@ -56,7 +56,7 @@ async function editImages(data) {
                     if (err) return reject(err);
                     return resolve();
                 });
-            console.log(`> Imagem ${input} editada`);
+            console.log(`>> Imagem ${sentenceIndex + 1} editada`);
         });
     }
 }
@@ -64,7 +64,7 @@ async function editImages(data) {
 async function generateImagesFromSentences(data) {
     for (let i = 0; i < data.sentences.length; i++) {
         await generateTextImage(data.sentences[i], i);
-        console.log(`> Imagem ${i} gerada`);
+        console.log(`>> Imagem ${i + 1} gerada`);
     }
 
     async function generateTextImage(sentence, index) {
@@ -132,8 +132,6 @@ async function createThumb(data) {
                 if (err) return reject(err);
                 return resolve();
             });
-        console.log('> Thumbnail Gerada');
-
     });
 
     response.catch(() => {
@@ -161,7 +159,8 @@ async function renderVideo(data) {
         pixelFormat: "yuv420p",
     };
 
-    data.music = audio.credits;
+    data.musicFont = audio.credits;
+    files.save(data);
 
     loadImages(images);
 

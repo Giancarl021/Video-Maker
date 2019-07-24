@@ -9,7 +9,6 @@ async function bot() {
     await getImages(data);
     console.log('> Baixando imagens');
     await downloadImages(data);
-    console.log('> Imagens carregadas');
     files.save(data);
 }
 
@@ -59,7 +58,7 @@ async function downloadImages(data) {
                     throw new Error('Imagem já carregada');
                 }
                 await downloadAndSaveImage(images[imgIndex], `${sentenceIndex}-original.png`);
-                console.log(`> Imagem carregada: ${images[imgIndex]}`);
+                console.log(`>> Imagem carregada: ${images[imgIndex]}`);
                 data.downloadedImages.push(images[imgIndex]);
                 break;
             } catch (err) {
