@@ -106,15 +106,23 @@ async function getKeyWords(data) {
                 text: sentence,
                 features: {
                     keywords: {}
-                }
+                },
+                language: 'pt'
             }, (err, res) => {
                 if (err) reject(err);
-                const keywords = res.keywords.map(e => e.text);
+                const keywords = res.keywords
+                    .sort((a, b) => {
+                        if (a.relevance < b.relevance) return 1;
+                        if (a.relevance > b.relevance) return -1;
+                        return 0;
+                    })
+                    .map(e => e.text);
                 resolve(keywords);
             })
         });
 
-        promise.catch(() => {
+        promise.catch((err) => {
+            console.log(err);
             console.log('> Erro ao carregar palavras-chave');
             process.exit(0);
         });
