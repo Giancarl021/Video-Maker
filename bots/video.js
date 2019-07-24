@@ -12,15 +12,14 @@ ffmpeg.setFfprobePath(ffprobePath);
 async function bot() {
     const data = files.load();
     console.log('> Editando imagens');
-    // await editImages(data);
-    console.log('> Imagens prontas');
-    console.log('> Gerando imagens de frases');
-    // await generateImagesFromSentences(data);
-    console.log('> Imagens geradas');
+    await editImages(data);
+    console.log('> Gerando imagens com sentenças');
+    await generateImagesFromSentences(data);
     console.log('> Gerando Thumbnail');
-    // await createThumb(data);
+    await createThumb(data);
     console.log('> Renderizando vídeo');
     await renderVideo(data);
+    console.log('> Renderização Concluída');
 }
 
 async function editImages(data) {
@@ -54,10 +53,10 @@ async function editImages(data) {
                 .out('-compose', 'over')
                 .out('-composite')
                 .write(output, err => {
-                    if (err) return reject(err)
+                    if (err) return reject(err);
+                    return resolve();
                 });
-            console.log(`> Imagem ${input} convertida`);
-            resolve();
+            console.log(`> Imagem ${input} editada`);
         });
     }
 }
@@ -65,36 +64,40 @@ async function editImages(data) {
 async function generateImagesFromSentences(data) {
     for (let i = 0; i < data.sentences.length; i++) {
         await generateTextImage(data.sentences[i], i);
+        console.log(`> Imagem ${i} gerada`);
     }
 
     async function generateTextImage(sentence, index) {
+        const output = `./data/images/${index}-sentence.png`;
+        const sentenceTemplates = [
+            {
+                size: '1920x400',
+                gravity: 'center'
+            },
+            {
+                size: '1920x1080',
+                gravity: 'center'
+            },
+            {
+                size: '800x1080',
+                gravity: 'west'
+            },
+            {
+                size: '800x1080',
+                gravity: 'east'
+            }
+        ];
+
+        const templateIndex = index > 3 ? index - 4 : index;
+
         return new Promise((resolve, reject) => {
-            const output = `./data/images/${index}-sentence.png`;
-            const sentenceTemplates = [
-                {
-                    size: '1920x400',
-                    gravity: 'center'
-                },
-                {
-                    size: '1920x1080',
-                    gravity: 'center'
-                },
-                {
-                    size: '800x1080',
-                    gravity: 'west'
-                },
-                {
-                    size: '800x1080',
-                    gravity: 'east'
-                }
-            ];
             gm()
                 .in(`./data/images/${index}-edited.png`)
                 .out('-brightness-contrast', '-30x-10')
                 .out('-background', 'transparent')
                 .out('-fill', 'white')
-                .out('-size', sentenceTemplates[index > 3 ? index - 4 : index].size)
-                .out('-gravity', sentenceTemplates[index > 3 ? index - 4 : index].gravity)
+                .out('-size', sentenceTemplates[templateIndex].size)
+                .out('-gravity', sentenceTemplates[templateIndex].gravity)
                 .out('-font', 'Calibri')
                 .out('-fill', 'white')
                 .out('-kerning', '-1')
@@ -102,14 +105,15 @@ async function generateImagesFromSentences(data) {
                 .out('-composite')
                 .write(output, err => {
                     if (err) return reject(err);
+                    return resolve();
                 });
-            resolve();
+
         });
     }
 }
 
 async function createThumb(data) {
-    return new Promise((resolve, reject) => {
+    const response = new Promise((resolve, reject) => {
         const text = `${data.prefix} ${data.searchTerm}`;
         gm()
             .in('./data/images/0-edited.png')
@@ -125,61 +129,78 @@ async function createThumb(data) {
             .out(`caption:${text}`)
             .out('-composite')
             .write('./data/images/thumb.jpg', err => {
-                if (err) reject(err)
+                if (err) return reject(err);
+                return resolve();
             });
         console.log('> Thumbnail Gerada');
-        resolve();
-    })
+
+    });
+
+    response.catch(() => {
+        console.log('> Erro ao gerar thumbnail');
+    });
+
+    return response;
 }
 
 async function renderVideo(data) {
-    await videoshowRender();
+    return videoshowRender();
 
     async function videoshowRender() {
-        const audioData = files.loadAudioData();
-        const audio = audioData[Math.floor(Math.random() * audioData.length)];
-        const images = [{
-            path: './data/images/static/start.png',
-            loop: audio.timeData.start
-        }];
-        for (let sentenceIndex = 0; sentenceIndex < data.sentences.length; sentenceIndex++) {
-            images.push({
-                path: `./data/images/${sentenceIndex}-edited.png`,
-                loop: audio.timeData.images[sentenceIndex]
-            });
-            images.push({
-                path: `./data/images/${sentenceIndex}-sentence.png`,
-                loop: audio.timeData.sentences[sentenceIndex]
-            });
-        }
+        const response = new Promise((resolve, reject) => {
+            const audioData = files.loadAudioData();
+            const audio = audioData[Math.floor(Math.random() * audioData.length)];
+            const images = [{
+                path: './data/images/static/start.png',
+                loop: audio.timeData.start
+            }];
+            for (let sentenceIndex = 0; sentenceIndex < data.sentences.length; sentenceIndex++) {
+                images.push({
+                    path: `./data/images/${sentenceIndex}-edited.png`,
+                    loop: audio.timeData.images[sentenceIndex]
+                });
+                images.push({
+                    path: `./data/images/${sentenceIndex}-sentence.png`,
+                    loop: audio.timeData.sentences[sentenceIndex]
+                });
+            }
 
-        images.push({
-            path: './data/images/static/end.png',
-            loop: 20
+            images.push({
+                path: './data/images/static/end.png',
+                loop: 20
+            });
+
+            const options = {
+                fps: 25,
+                loop: 5,
+                transition: true,
+                transitionDuration: 0.5,
+                videoBitrate: 4000,
+                videoCodec: "libx264",
+                size: "?x1080",
+                audioBitrate: "128k",
+                audioChannels: 2,
+                format: "mp4",
+                pixelFormat: "yuv420p",
+            };
+            videoshow(images, options)
+                .audio(audio.path)
+                .save('data/render.mp4')
+                .on('error', err => {
+                    console.log('> Erro ao renderizar vídeo: ', err);
+                    reject(err);
+                })
+                .on('end', () => {
+                    resolve();
+                });
         });
 
-        const options = {
-            fps: 25,
-            loop: 5,
-            transition: true,
-            transitionDuration: 1,
-            videoBitrate: 4000,
-            videoCodec: "libx264",
-            size: "?x1080",
-            audioBitrate: "128k",
-            audioChannels: 2,
-            format: "mp4",
-            pixelFormat: "yuv420p",
-        };
-        return videoshow(images, options)
-        .audio(audio.path)
-            .save('data/render.mp4')
-            .on('error', err => {
-                console.log('> Erro ao renderizar vídeo: ', err);
-            })
-            .on('end', () => {
-                console.log('> Vídeo renderizado');
-            });
+        response.catch(() => {
+            console.log('> Erro ao renderizar o vídeo');
+            process.exit(0);
+        });
+
+        return response;
     }
 }
 
