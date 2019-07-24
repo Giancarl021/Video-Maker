@@ -23,7 +23,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "gm": "^1.23.1",
     "googleapis": "^41.0.1",
-    "ibm-watson": "^4.2.5",
+    "ibm-watson": "^4.2.6",
     "image-downloader": "^3.4.2",
     "readline-sync": "^1.4.9",
     "sbd": "^1.0.16",
