@@ -11,7 +11,7 @@ async function init() {
     // await bots.text();
     // await bots.image();
     await bots.video();
-    bots.cleaner();
+    // bots.cleaner();
 }
 
 init().catch(err => {

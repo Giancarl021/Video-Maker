@@ -1,0 +1,29 @@
+[
+  {
+    "path": "./data/audio-src/summer.mp3",
+    "credits": "Music: Summer - https://www.bensound.com",
+    "timeData": {
+      "start": 9,
+      "images": [
+        2.25,
+        2.26,
+        2.26,
+        2.27,
+        2.28,
+        2.3,
+        2.06,
+        2.26
+      ],
+      "sentences": [
+        6.79,
+        6.8,
+        6.79,
+        6.78,
+        6.77,
+        6.77,
+        6.8,
+        6.8
+      ]
+    }
+  }
+]

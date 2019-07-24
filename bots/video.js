@@ -13,10 +13,8 @@ async function bot() {
     const data = files.load();
     console.log('> Editando imagens');
     await editImages(data);
-    console.log('> Imagens prontas');
-    console.log('> Gerando imagens de frases');
+    console.log('> Gerando imagens com sentenças');
     await generateImagesFromSentences(data);
-    console.log('> Imagens geradas');
     console.log('> Gerando Thumbnail');
     await createThumb(data);
     console.log('> Renderizando vídeo');
@@ -30,7 +28,7 @@ async function editImages(data) {
     }
 
     async function editImage(sentenceIndex) {
-        const response = new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             const input = `data/images/${sentenceIndex}-original.png[0]`;
             const output = `data/images/${sentenceIndex}-edited.png`;
             const size = {
@@ -55,54 +53,51 @@ async function editImages(data) {
                 .out('-compose', 'over')
                 .out('-composite')
                 .write(output, err => {
-                    if (err) return reject(err)
+                    if (err) return reject(err);
+                    return resolve();
                 });
-            console.log(`> Imagem ${input} convertida`);
-            resolve();
+            console.log(`> Imagem ${input} editada`);
         });
-
-        response.catch(() => {
-            console.log('> Erro ao editar imagens');
-            process.exit(0);
-        });
-
-        return response;
     }
 }
 
 async function generateImagesFromSentences(data) {
     for (let i = 0; i < data.sentences.length; i++) {
         await generateTextImage(data.sentences[i], i);
+        console.log(`> Imagem ${i} gerada`);
     }
 
     async function generateTextImage(sentence, index) {
-        const response = new Promise((resolve, reject) => {
-            const output = `./data/images/${index}-sentence.png`;
-            const sentenceTemplates = [
-                {
-                    size: '1920x400',
-                    gravity: 'center'
-                },
-                {
-                    size: '1920x1080',
-                    gravity: 'center'
-                },
-                {
-                    size: '800x1080',
-                    gravity: 'west'
-                },
-                {
-                    size: '800x1080',
-                    gravity: 'east'
-                }
-            ];
+        const output = `./data/images/${index}-sentence.png`;
+        const sentenceTemplates = [
+            {
+                size: '1920x400',
+                gravity: 'center'
+            },
+            {
+                size: '1920x1080',
+                gravity: 'center'
+            },
+            {
+                size: '800x1080',
+                gravity: 'west'
+            },
+            {
+                size: '800x1080',
+                gravity: 'east'
+            }
+        ];
+
+        const templateIndex = index > 3 ? index - 4 : index;
+
+        return new Promise((resolve, reject) => {
             gm()
                 .in(`./data/images/${index}-edited.png`)
                 .out('-brightness-contrast', '-30x-10')
                 .out('-background', 'transparent')
                 .out('-fill', 'white')
-                .out('-size', sentenceTemplates[index > 3 ? index - 4 : index].size)
-                .out('-gravity', sentenceTemplates[index > 3 ? index - 4 : index].gravity)
+                .out('-size', sentenceTemplates[templateIndex].size)
+                .out('-gravity', sentenceTemplates[templateIndex].gravity)
                 .out('-font', 'Calibri')
                 .out('-fill', 'white')
                 .out('-kerning', '-1')
@@ -110,16 +105,10 @@ async function generateImagesFromSentences(data) {
                 .out('-composite')
                 .write(output, err => {
                     if (err) return reject(err);
+                    return resolve();
                 });
-            resolve();
-        });
 
-        response.catch(() => {
-            console.log('> Erro ao criar imagens de sentenças');
-            process.exit(0);
         });
-
-        return response;
     }
 }
 
@@ -140,10 +129,11 @@ async function createThumb(data) {
             .out(`caption:${text}`)
             .out('-composite')
             .write('./data/images/thumb.jpg', err => {
-                if (err) reject(err)
+                if (err) return reject(err);
+                return resolve();
             });
         console.log('> Thumbnail Gerada');
-        resolve();
+
     });
 
     response.catch(() => {
@@ -154,7 +144,7 @@ async function createThumb(data) {
 }
 
 async function renderVideo(data) {
-    await videoshowRender();
+    return videoshowRender();
 
     async function videoshowRender() {
         const response = new Promise((resolve, reject) => {
