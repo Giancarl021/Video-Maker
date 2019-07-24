@@ -56,7 +56,7 @@ async function editImages(data) {
                     if (err) return reject(err);
                     return resolve();
                 });
-            console.log(`> Imagem ${input} editada`);
+            console.log(`>> Imagem ${sentenceIndex + 1} editada`);
         });
     }
 }
@@ -64,7 +64,7 @@ async function editImages(data) {
 async function generateImagesFromSentences(data) {
     for (let i = 0; i < data.sentences.length; i++) {
         await generateTextImage(data.sentences[i], i);
-        console.log(`> Imagem ${i} gerada`);
+        console.log(`>> Imagem ${i + 1} gerada`);
     }
 
     async function generateTextImage(sentence, index) {
@@ -132,8 +132,6 @@ async function createThumb(data) {
                 if (err) return reject(err);
                 return resolve();
             });
-        console.log('> Thumbnail Gerada');
-
     });
 
     response.catch(() => {
@@ -144,63 +142,62 @@ async function createThumb(data) {
 }
 
 async function renderVideo(data) {
-    return videoshowRender();
+    const images = [];
+    const audioData = files.loadAudioData();
+    const audio = audioData[Math.floor(Math.random() * audioData.length)];
+    const options = {
+        fps: 25,
+        loop: 5,
+        transition: true,
+        transitionDuration: 0.5,
+        videoBitrate: 4000,
+        videoCodec: "libx264",
+        size: "?x1080",
+        audioBitrate: "128k",
+        audioChannels: 2,
+        format: "mp4",
+        pixelFormat: "yuv420p",
+    };
 
-    async function videoshowRender() {
-        const response = new Promise((resolve, reject) => {
-            const audioData = files.loadAudioData();
-            const audio = audioData[Math.floor(Math.random() * audioData.length)];
-            const images = [{
-                path: './data/images/static/start.png',
-                loop: audio.timeData.start
-            }];
-            for (let sentenceIndex = 0; sentenceIndex < data.sentences.length; sentenceIndex++) {
-                images.push({
-                    path: `./data/images/${sentenceIndex}-edited.png`,
-                    loop: audio.timeData.images[sentenceIndex]
-                });
-                images.push({
-                    path: `./data/images/${sentenceIndex}-sentence.png`,
-                    loop: audio.timeData.sentences[sentenceIndex]
-                });
-            }
+    data.musicFont = audio.credits;
+    files.save(data);
 
-            images.push({
-                path: './data/images/static/end.png',
-                loop: 20
+    loadImages(images);
+
+    return new Promise((resolve, reject) => {
+        videoshow(images, options)
+            .audio(audio.path)
+            .save('data/render.mp4')
+            .on('error', err => {
+                console.log('> Erro ao renderizar vídeo: ', err);
+                reject(err);
+            })
+            .on('end', () => {
+                resolve();
             });
+    });
 
-            const options = {
-                fps: 25,
-                loop: 5,
-                transition: true,
-                transitionDuration: 0.5,
-                videoBitrate: 4000,
-                videoCodec: "libx264",
-                size: "?x1080",
-                audioBitrate: "128k",
-                audioChannels: 2,
-                format: "mp4",
-                pixelFormat: "yuv420p",
-            };
-            videoshow(images, options)
-                .audio(audio.path)
-                .save('data/render.mp4')
-                .on('error', err => {
-                    console.log('> Erro ao renderizar vídeo: ', err);
-                    reject(err);
-                })
-                .on('end', () => {
-                    resolve();
-                });
+    function loadImages(images) {
+        images.push({
+            path: './data/images/static/start.png',
+            loop: audio.timeData.start
         });
 
-        response.catch(() => {
-            console.log('> Erro ao renderizar o vídeo');
-            process.exit(0);
-        });
+        for (let sentenceIndex = 0; sentenceIndex < data.sentences.length; sentenceIndex++) {
+            images.push({
+                path: `./data/images/${sentenceIndex}-edited.png`,
+                loop: audio.timeData.images[sentenceIndex]
+            });
+            images.push({
+                path: `./data/images/${sentenceIndex}-sentence.png`,
+                loop: audio.timeData.sentences[sentenceIndex]
+            });
+        }
 
-        return response;
+        images.push({
+            path: './data/images/static/end.png',
+            loop: 20
+        });
     }
 }
 

@@ -17,15 +17,14 @@ const files = require('./files');
 
 async function bot() {
     const data = files.load();
-    console.log('> Carregando artigo da Wikipedia');
+    console.log('> Pesquisando artigos na Wikipedia');
     await getTextFromWikipedia(data);
-    console.log('> Artigo Carregado');
+    console.log('> Preparando artigo');
     sanitizeText(data);
     breakTextIntoSentences(data);
     limitMaxSentences(data);
     console.log('> Gerando palavras-chave');
     await getKeyWords(data);
-    console.log('> Palavras-chave geradas');
     files.save(data);
 }
 
