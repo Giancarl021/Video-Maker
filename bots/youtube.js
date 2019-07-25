@@ -1,14 +1,16 @@
 const files = require('./files');
 const google = require('googleapis').google;
-const express = require('express');
 const oAuth2 = google.auth.OAuth2;
+const youtube = google.youtube({version: 'v3'});
+const express = require('express');
+const fs = require('fs');
 
 async function bot() {
     const data = files.load();
     await oAuthAuthenticate();
-    await updateVideo();
-    await updateThumbnail();
-    files.save(data);
+    const videoInfo = await uploadVideo(data);
+    await updateThumbnail(videoInfo);
+    // files.save(data);
 }
 
 async function oAuthAuthenticate() {
@@ -57,7 +59,8 @@ async function oAuthAuthenticate() {
         return new Promise((resolve, reject) => {
             webServer.app.get('/oauth2callback', (req, res) => {
                 const authCode = req.query.code;
-                console.log(`> Autorização dada: ${authCode}`);
+                if (!authCode) reject('> Autorização negada');
+                console.log('> Autorização Concedida');
                 res.send('<h1>Obrigado!</h1><p>Agora feche esta aba</p>');
                 resolve(authCode);
             });
@@ -83,20 +86,67 @@ async function oAuthAuthenticate() {
 
     async function stopWebServer(webServer) {
         return new Promise((resolve, reject) => {
-            webServer.server.stop(() => {
-               resolve();
+            webServer.server.close(() => {
+                resolve();
             });
         });
     }
 
 }
 
-async function updateVideo() {
+async function uploadVideo(data) {
+    const videoPath = './data/render.mp4';
+    const videoSize = fs.statSync(videoPath).size;
+    const videoTitle = `${data.prefix} ${data.searchTerm}`;
+    const videoTags = [data.searchTerm, ...data.sentences[0].keywords];
+    const videoDescription = data.sentences.map(e => e.text).join('\n\n');
 
+    const requestParams = {
+        part: 'snippet, status',
+        requestBody: {
+            snippet: {
+                title: videoTitle,
+                description: videoDescription,
+                tags: videoTags
+            },
+            status: {
+                privacyStatus: 'unlisted'
+            }
+        },
+        media: {
+            body: fs.createReadStream(videoPath)
+        }
+    };
+
+    const youtubeResponse = await youtube.videos.insert(requestParams, {
+        onUploadProgress: uploadProcess
+    });
+
+    console.log(`> Vídeo disponível em: https://youtu.be/${youtubeResponse.data.id}`);
+    return youtubeResponse.data;
+
+    function uploadProcess(event) {
+        const progress = Math.round((event.bytesRead / videoSize));
+        console.log(`> Progresso em ${progress}%`);
+    }
 }
 
-async function updateThumbnail() {
+async function updateThumbnail(videoInfo) {
+    const thumbnail = {
+        videoId: videoInfo.id,
+        path: './data/images/thumb.jpg'
+    };
 
+    const requestParams = {
+        videoId: thumbnail.videoId,
+        media: {
+            mimeType: 'image/jpeg',
+            body: fs.createReadStream(thumbnail.path)
+        }
+    };
+
+    const youtubeResponse = await youtube.thumbnails.set(requestParams);
+    console.log('> Thumbnail exportada');
 }
 
 module.exports = bot;
