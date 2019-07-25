@@ -126,7 +126,7 @@ async function uploadVideo(data) {
     return youtubeResponse.data;
 
     function uploadProcess(event) {
-        const progress = Math.round((event.bytesRead / videoSize));
+        const progress = Math.round((event.bytesRead / videoSize) * 100);
         console.log(`> Progresso em ${progress}%`);
     }
 }
