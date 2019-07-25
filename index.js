@@ -8,14 +8,14 @@ const bots = {
 };
 
 async function init() {
-    // bots.cleaner();
-    // bots.input.main();
-    // await bots.text();
-    // await bots.image();
-    // await bots.video();
+    bots.cleaner();
+    bots.input.main();
+    await bots.text();
+    await bots.image();
+    await bots.video();
     await bots.youtube();
 }
 
 init().catch(err => {
-    console.log('Erro no programa: ', err);
+    console.log('> Erro no programa: ', err);
 });
