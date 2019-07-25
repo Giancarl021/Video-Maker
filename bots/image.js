@@ -33,7 +33,7 @@ async function returnImageLinks(query) {
         q: query,
         num: 5,
         searchType: 'image',
-        imgSize: 'huge',
+        // imgSize: 'huge',
         safe: 'high'
     });
 
