@@ -29,7 +29,7 @@ async function getImages(data) {
 async function returnImageLinks(query) {
     const response = await googleSearch.cse.list({
         auth: googleCredentials.APIKey,
-        cx: googleCredentials.SerachEngineAPIKey,
+        cx: googleCredentials.SearchEngineAPIKey,
         q: query,
         num: 5,
         searchType: 'image',
