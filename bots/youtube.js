@@ -101,6 +101,8 @@ async function uploadVideo(data) {
     const videoTags = [data.searchTerm, ...data.sentences[0].keywords];
     const videoDescription = data.sentences.map(e => e.text).join('\n\n');
 
+    let lastPercentUploaded = -1;
+
     const requestParams = {
         part: 'snippet, status',
         requestBody: {
@@ -127,7 +129,10 @@ async function uploadVideo(data) {
 
     function uploadProcess(event) {
         const progress = Math.round((event.bytesRead / videoSize) * 100);
-        console.log(`> Progresso em ${progress}%`);
+        if (progress > lastPercentUploaded) {
+            console.log(`> Progresso em ${progress}%`);
+            lastPercentUploaded = progress;
+        }
     }
 }
 
@@ -145,7 +150,7 @@ async function updateThumbnail(videoInfo) {
         }
     };
 
-    const youtubeResponse = await youtube.thumbnails.set(requestParams);
+    await youtube.thumbnails.set(requestParams);
     console.log('> Thumbnail exportada');
 }
 
