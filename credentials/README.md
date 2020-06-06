@@ -3,6 +3,9 @@
 Esta pasta contém os arquivos necessários para autenticar o uso de APIs necessárias para o 
 funcionamento da aplicação.
 
+## Como Obter
+Um tuturial detalhado se encontra no [README](https://github.com/filipedeschamps/video-maker/blob/master/README.md) repositório original.
+
 ## algorithmia.json
 
 ### Estrutura
@@ -12,12 +15,6 @@ funcionamento da aplicação.
   "ApiKey": "..."
 }
 ```
-
-### Como obter
-
-Crie uma conta no [Algorithmia](https://algorithmia.com/), e após o cadastro vá para sua *home*
-e clique em **API Keys**. Em seguida copie o conteúdo dentro de *default-key* e cole no valor para
-a chave "ApiKey" no arquivo *json*.
 
 ## google-custom-search.json
 
@@ -29,10 +26,6 @@ a chave "ApiKey" no arquivo *json*.
   "SearchEngineAPIKey": "..."
 }
 ```
-
-### Como obter
-
-**_Work in Progress..._**
 
 ## google-youtube.json
 
@@ -57,10 +50,6 @@ a chave "ApiKey" no arquivo *json*.
 }
 ```
 
-### Como obter
-
-**_Work in Progress..._**
-
 ## watson-nul.json
 
 ### Estrutura
@@ -74,7 +63,3 @@ a chave "ApiKey" no arquivo *json*.
   "url": "..."
 }
 ```
-
-### Como obter
-
-**_Work in Progress..._**
