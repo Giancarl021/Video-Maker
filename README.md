@@ -113,6 +113,3 @@ Dentro da pasta *Credentials* será necessária a adição de 4 arquivos:
  - audio/src/*.mp3
  - images/static/start.png
  - images/static/end.png
- 
- Para mais detalhes sobre o que cada arquivo precisa conter leia o arquivo [README](data/README.md)
- localizado na pasta *data*
